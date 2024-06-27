@@ -83,8 +83,12 @@ public class GoogleScraper : IDisposable
         string? color = null, GoogleImageType type = GoogleImageType.Any, GoogleImageTime time = GoogleImageTime.Any,
         string? license = null, string? language = null)
     {
+        Console.WriteLine("GetImagesAsync called from N-Scraper.");
+
         // TODO: Use pagination
         GScraperGuards.NotNull(query, nameof(query));
+
+        Console.WriteLine($"Name of query for image search: {query}");
 
         var uri = new Uri(BuildImageQuery(query, safeSearch, size, color, type, time, license, language), UriKind.Relative);
         byte[] bytes = await _httpClient.GetByteArrayAsync(uri).ConfigureAwait(false);
@@ -98,7 +102,7 @@ public class GoogleScraper : IDisposable
     private static string BuildImageQuery(string query, SafeSearchLevel safeSearch, GoogleImageSize size, string? color,
         GoogleImageType type, GoogleImageTime time, string? license, string? language)
     {
-        string url = $"?q={Uri.EscapeDataString(query)}&tbm=isch&asearch=isch&async=_fmt:json,p:1&tbs=";
+        string url = $"?q={Uri.EscapeDataString(query)}&asearch=isch&async=_fmt:json,p:1&tbs=";
 
         url += size == GoogleImageSize.Any ? ',' : $"isz:{(char)size},";
         url += string.IsNullOrEmpty(color) ? ',' : $"ic:{color},";
@@ -115,6 +119,7 @@ public class GoogleScraper : IDisposable
         if (!string.IsNullOrEmpty(language))
             url += $"&lr=lang_{language}&hl={language}";
 
+        Console.WriteLine($"Complete google search string: {url}");
         return url;
     }
 
